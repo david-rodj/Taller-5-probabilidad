@@ -98,16 +98,50 @@ if (!is.null(col_motivo)) {
       cat("Moda:", df_motivo$Motivo[1], "(", df_motivo$Frecuencia[1], "ocurrencias )\n")
       
       # Gráfico de barras
+
+      
+      # Generar gráfica mejorada de barras
       tryCatch({
-        jpeg(filename = "graficas/motivo_viaje_barras.jpg", width = 800, height = 600, quality = 100)
-        par(mar = c(10, 4, 4, 2) + 0.1)  # Aumentar margen inferior para etiquetas
-        barplot(tabla_motivo, main="Frecuencia de Motivo del Viaje", 
-                col=rainbow(length(tabla_motivo)), las=2, cex.names=0.8)
+        # Crear un nuevo dispositivo gráfico
+        jpeg(filename = "graficas/motivo_viaje_barras_mejorado.jpg", width = 1000, height = 700, quality = 100)
+        
+        # Aumentar los márgenes para etiquetas largas
+        par(mar = c(12, 6, 4, 2) + 0.1)
+        
+        # Definir colores para las barras
+        colores <- rainbow(length(tabla_motivo))
+        
+        # Crear barras con espacio entre ellas
+        barplot(tabla_motivo, 
+                main = "Frecuencia de Motivo del Viaje",
+                col = colores, 
+                las = 2,           # Etiquetas horizontales
+                cex.names = 0.8,   # Tamaño de texto para etiquetas
+                space = 0.8,       # Espacio entre barras
+                ylim = c(0, max(tabla_motivo) * 1.1)) # Límite vertical con 10% extra
+        
+        # Añadir línea base
+        abline(h = 0, col = "gray")
+        
+        # Añadir etiquetas con valores encima de cada barra
+        barras <- barplot(tabla_motivo, 
+                          main = "Frecuencia de Motivo del Viaje",
+                          col = colores, 
+                          las = 2,           
+                          cex.names = 0.8,   
+                          space = 0.8,       
+                          ylim = c(0, max(tabla_motivo) * 1.1),
+                          plot = FALSE)  # Solo para obtener las posiciones
+        
+        # Añade etiquetas con valores
+        text(x = barras, 
+             y = tabla_motivo + max(tabla_motivo) * 0.03,  # Posición ligeramente por encima
+             labels = tabla_motivo,
+             cex = 0.8)  # Tamaño del texto
+        
         dev.off()
-        cat("Gráfico guardado: graficas/motivo_viaje_barras.jpg\n")
-      }, error = function(e) {
-        cat("Error al crear el gráfico:", e$message, "\n")
-        if (names(dev.cur()) != "null device") dev.off()
+        cat("Gráfico mejorado guardado: graficas/motivo_viaje_barras_mejorado.jpg\n")
+        
       })
     } else {
       cat("No hay datos válidos para MOTIVO DEL VIAJE\n")
@@ -141,15 +175,52 @@ if (!is.null(col_alojamiento)) {
       cat("Moda:", df_alojamiento$Alojamiento[1], "(", df_alojamiento$Frecuencia[1], "ocurrencias )\n")
       
       # Gráfico de barras
+      # Generar gráfica mejorada de barras para TIPO ALOJAMIENTO
       tryCatch({
-        jpeg(filename = "graficas/tipo_alojamiento_barras.jpg", width = 800, height = 600, quality = 100)
-        par(mar = c(10, 4, 4, 2) + 0.1)  # Aumentar margen inferior para etiquetas
-        barplot(tabla_alojamiento, main="Frecuencia de Tipo de Alojamiento", 
-                col=rainbow(length(tabla_alojamiento)), las=2, cex.names=0.8)
+        # Crear un nuevo dispositivo gráfico
+        jpeg(filename = "graficas/tipo_alojamiento_barras_mejorado.jpg", width = 1000, height = 700, quality = 100)
+        
+        # Aumentar los márgenes para etiquetas largas
+        par(mar = c(8, 6, 4, 2) + 0.1)
+        
+        # Definir colores para las barras - un color diferente para cada tipo de alojamiento
+        colores <- rainbow(length(tabla_alojamiento))
+        
+        # Calcular las posiciones de las barras (sin dibujarlas aún)
+        barras <- barplot(tabla_alojamiento, 
+                          plot = FALSE,  # Solo para obtener las posiciones
+                          space = 0.8)   # Espacio entre barras
+        
+        # Dibujar las barras con límite Y ajustado para dar espacio a las etiquetas
+        barplot(tabla_alojamiento, 
+                main = "Frecuencia de Tipo de Alojamiento",
+                col = colores, 
+                las = 2,           # Etiquetas horizontales
+                cex.names = 0.9,   # Tamaño de texto para etiquetas
+                space = 0.8,       # Espacio entre barras
+                ylim = c(0, max(tabla_alojamiento) * 1.1)) # Límite vertical con 10% extra
+        
+        # Añadir línea base
+        abline(h = 0, col = "gray")
+        
+        # Añadir etiquetas con valores encima de cada barra
+        text(x = barras, 
+             y = tabla_alojamiento + max(tabla_alojamiento) * 0.03,  # Posición ligeramente por encima
+             labels = tabla_alojamiento,
+             cex = 0.9,   # Tamaño del texto
+             font = 2)    # Negrita
+        
+        # Añadir título de los ejes
+        title(ylab = "Frecuencia")
+        
+        # Añadir cuadrícula horizontal para mejor legibilidad
+        grid(NA, NULL, lwd = 1, col = "lightgray")
+        
         dev.off()
-        cat("Gráfico guardado: graficas/tipo_alojamiento_barras.jpg\n")
+        cat("Gráfico mejorado guardado: graficas/tipo_alojamiento_barras_mejorado.jpg\n")
       }, error = function(e) {
         cat("Error al crear el gráfico:", e$message, "\n")
+        # Asegurar que el dispositivo gráfico se cierre en caso de error
         if (names(dev.cur()) != "null device") dev.off()
       })
     } else {
