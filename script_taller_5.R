@@ -300,9 +300,39 @@ analizar_variable_numerica <- function(datos, col_nombre, nombre_variable) {
   tryCatch({
     nombre_archivo_hist <- paste0("graficas/", gsub("[^a-zA-Z0-9]", "_", tolower(nombre_variable)), "_histograma.jpg")
     jpeg(filename = nombre_archivo_hist, width = 800, height = 600, quality = 100)
-    hist(variable_clean, main = paste("Histograma de", nombre_variable), 
-         xlab = nombre_variable, col = "lightblue", border = "white",
-         breaks = min(max(nclass.Sturges(variable_clean), 5), 30))
+    
+    # Calcular el histograma sin dibujarlo para obtener los valores de conteo
+    hist_data <- hist(variable_clean, 
+                      breaks = min(max(nclass.Sturges(variable_clean), 5), 30),
+                      plot = FALSE)
+    
+    # Ajustar el límite Y para darle más espacio (20% adicional)
+    ylim_max <- max(hist_data$counts) * 1.2
+    
+    # Dibujar el histograma con límites ajustados
+    hist(variable_clean, 
+         main = paste("Histograma de", nombre_variable), 
+         xlab = nombre_variable, 
+         ylab = "Frecuencia",
+         col = "lightblue", 
+         border = "white",
+         breaks = min(max(nclass.Sturges(variable_clean), 5), 30),
+         ylim = c(0, ylim_max))
+    
+    # Añadir los valores de frecuencia encima de cada barra
+    for (i in 1:length(hist_data$counts)) {
+      if (hist_data$counts[i] > 0) {  # Solo etiquetar barras con valores mayores a cero
+        text(x = hist_data$mids[i],    # Centro de la barra
+             y = hist_data$counts[i] + (ylim_max * 0.02),  # Ligeramente por encima
+             labels = hist_data$counts[i],
+             cex = 0.8,  # Tamaño del texto
+             font = 2)   # Negrita
+      }
+    }
+    
+    # Añadir cuadrícula para mejor visualización
+    grid(NA, NULL, lwd = 1, col = "lightgray")
+    
     dev.off()
     cat("Histograma guardado:", nombre_archivo_hist, "\n")
   }, error = function(e) {
